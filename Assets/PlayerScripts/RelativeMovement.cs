@@ -43,6 +43,10 @@ public class RelativeMovement : MonoBehaviour {
 		movement.x = horInput * moveSpeed;
 		movement.z = vertInput * moveSpeed;
 
+        //Debug.Log(movement.x);
+
+        this.gameObject.GetComponent<AnimatePlayer>().SelectingAnimatation(movement);
+
 		movement = Vector3.ClampMagnitude (movement, moveSpeed);
 
 		if (horInput != 0 || vertInput != 0) {
@@ -72,7 +76,7 @@ public class RelativeMovement : MonoBehaviour {
 			else {
 				
 				vertSpeed = -0.1f;
-				animate.SetBool ("OnGround", false);
+				animate.SetBool ("Jumping", false);
 			}
 		} else {
 			vertSpeed += control.Gravity * 5 * Time.deltaTime;
@@ -81,7 +85,7 @@ public class RelativeMovement : MonoBehaviour {
 				vertSpeed = control.TerminalVelocity;
 
 			if (contact != null)
-				animate.SetBool ("OnGround", true);
+				animate.SetBool ("Jumping", true);
 
 			if (charController.isGrounded) {
 				if (Vector3.Dot (movement, contact.normal) < 0)
