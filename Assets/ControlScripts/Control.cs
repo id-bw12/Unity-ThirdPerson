@@ -54,6 +54,7 @@ public class Control : MonoBehaviour {
 		playerObject.AddComponent<PlayerControl> ();
 
 		playerObject.AddComponent<RelativeMovement> ();
+		playerObject.AddComponent<AnimatePlayer> ();
 	}
 
 	void SetupCamera (){

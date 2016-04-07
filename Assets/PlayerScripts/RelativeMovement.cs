@@ -10,6 +10,7 @@ public class RelativeMovement : MonoBehaviour {
 	private ControllerColliderHit contact;
 	private Animator animate;
 	private PlayerControl control;
+	private bool isGrounded = true;
 
 	// Use this for initialization
 	void Start () {
@@ -20,6 +21,7 @@ public class RelativeMovement : MonoBehaviour {
 
 		charController.center = new Vector3 (0, 1, 0);
 		charController.radius = 0.4f;
+		charController.height = 1.88f;
 
 		control = gameObject.GetComponent<PlayerControl> ();
 
@@ -43,12 +45,29 @@ public class RelativeMovement : MonoBehaviour {
 		movement.x = horInput * moveSpeed;
 		movement.z = vertInput * moveSpeed;
 
-        //Debug.Log(movement.x);
-
         this.gameObject.GetComponent<AnimatePlayer>().SelectingAnimatation(movement);
 
 		movement = Vector3.ClampMagnitude (movement, moveSpeed);
 
+		RotatePlayer (horInput,vertInput, ref movement);
+
+		if (vertSpeed < 0 && Physics.Raycast (transform.position, Vector3.down, out hit)) {
+
+			float check = (charController.height + charController.radius) / 9.9f;
+
+			hitGround = hit.distance <= check;
+		}
+
+		CheckJumping (hitGround, ref movement);
+
+		movement.y = vertSpeed;
+
+		movement *= Time.deltaTime;
+		charController.Move (movement);
+	}
+
+	void RotatePlayer(float horInput, float vertInput, ref Vector3 movement){
+	
 		if (horInput != 0 || vertInput != 0) {
 
 			movement.x = horInput;
@@ -63,18 +82,30 @@ public class RelativeMovement : MonoBehaviour {
 			transform.rotation = Quaternion.LookRotation (movement);
 		}
 
-		if (vertSpeed < 0 && Physics.Raycast (transform.position, Vector3.down, out hit)) {
+	}
 
-			float check = (charController.height + charController.radius) / 1.9f;
+	void OnControllerColliderHit(ControllerColliderHit hit){
 
-			hitGround = hit.distance <= check;
-		}
+		contact = hit;
+	}
 
-		if (hitGround) {
+	/****************************************************************
+	 * 	NAME: 			CheckingJumping
+	 *  DESCRIPTION:	Passes a boolean and references a Vector3
+	 * 					variable and checks if the player is grounded
+	 * 					and 
+	 * 					then passes it to the game logic and 
+	 * 					activate to the timer.
+	 * 
+	 * ***************************************************************/
+
+	void CheckJumping(bool isGrounded, ref Vector3 movement){
+		
+		if (isGrounded) {
 			if (Input.GetButton ("Jump"))
 				vertSpeed = control.JumpSpeed;
 			else {
-				
+
 				vertSpeed = -0.1f;
 				animate.SetBool ("Jumping", false);
 			}
@@ -83,8 +114,8 @@ public class RelativeMovement : MonoBehaviour {
 
 			if (vertSpeed < control.TerminalVelocity)
 				vertSpeed = control.TerminalVelocity;
-
-			if (contact != null)
+			
+			if (contact != null) 
 				animate.SetBool ("Jumping", true);
 
 			if (charController.isGrounded) {
@@ -95,15 +126,5 @@ public class RelativeMovement : MonoBehaviour {
 			}
 
 		}
-
-		movement.y = vertSpeed;
-
-		movement *= Time.deltaTime;
-		charController.Move (movement);
-	}
-
-	void OnControllerColliderHit(ControllerColliderHit hit){
-
-		contact = hit;
 	}
 }

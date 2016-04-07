@@ -25,23 +25,21 @@ public class AnimatePlayer : MonoBehaviour {
 
             animate.SetFloat("Speed", 1.0f);
 
+			//if moving to the left 
             if (movement.x < 0.0f)
-            {
                 animate.SetFloat("Forward", 0.4f);
-                Debug.Log("good");
-            }
-            else
+            else //If moving to the right
                 if (movement.x > 0.0f)
-                animate.SetFloat("Forward", 0.9f);
+                	animate.SetFloat("Forward", 0.9f);
 
         }
-        else
+        else //if not moving at all
             if (movement.x == 0 && movement.z != 0){
             animate.SetFloat("Speed",1.0f);
             animate.SetFloat("Forward", 0.0f);
         }
 
-        if (movement.magnitude == 0)
+		if (movement.y == 0.0f && movement.x == 0.0f && movement.z == 0.0f) 
             animate.SetFloat("Speed", 0.0f);
        
     }
